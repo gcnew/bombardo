@@ -286,7 +286,8 @@ function explode(b: Bomb) {
             const direction = dx ? 'x' : 'y';
             toAdd.push({ kind: 'splash', x, y, deleted: false, direction, time: lastT });
 
-            // TODO: destroying happen at the end of the `tick` loop as other bombs should be stopped as well
+            // TODO: destruction happens at the end of the `tick` as other bombs should be
+            // stopped by this dirt as well
             if (tile.kind === 'dirt') {
                 toDestroy.push({ x, y });
                 break;
@@ -516,13 +517,17 @@ function initGrid() {
     for (const player of players) {
         const px = player.x | 0;
         const py = player.y | 0;
-        [px, px + 1, px - 1]
-            .flatMap(x => [py, py + 1, py - 1].map(y => [x, y] as const))
-            .forEach(([x, y]) => {
+
+        for (let dx = -1; dx <= 1; ++dx) {
+            for (let dy = -1; dy <= 1; ++dy) {
+                const x = px + dx;
+                const y = py + dy;
+
                 if (grid[x + y * cols]!.kind === 'dirt') {
                     grid[x + y * cols] = { kind: 'grass' };
                 }
-            });
+            }
+        }
     }
 }
 
